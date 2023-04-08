@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+
+{% block title %}free people{% endblock  %}
+
+{% block content %}
+
+<table class="table table-success table-striped">
+  <thead>
+    <tr>
+
+        <th scope="col">Name</th>
+        <th scope="col">Age</th>
+        <th scope="col">Email</th>
+
+    </tr>
+  </thead>
+  <tbody>
+        {% for name,info in free_people.items %}
+    <tr>
+
+            <td>{{ name }}</td>
+            {% for inf in info %}
+                <td>{{ inf }}</td>
+            {% endfor %}
+
+    </tr>
+        {% endfor %}
+
+  </tbody>
+</table>
+
+
+
+{% endblock %}
+
+
+
+
