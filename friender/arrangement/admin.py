@@ -76,6 +76,7 @@ class HobbiesAdmin(admin.ModelAdmin):
     list_display_links = ['hobby', 'category']
     search_fields = ['hobby']
     ordering = ['hobby']
+    filter_horizontal = ('user',)
     inlines = [
         HobbiesInLine
     ]

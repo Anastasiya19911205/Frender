@@ -111,7 +111,7 @@ def booking_place(request):
         form = BookingUserForm(request.POST)
         context['form'] = form
         if form.is_valid():
-            form.save()
+
             return redirect('friends')
     else:
         form = BookingUserForm()

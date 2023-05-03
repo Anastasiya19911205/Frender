@@ -9,7 +9,12 @@ def validate_length_description(value):
             "need more than 2 words",
 
         )
+def validate_length_comment_description(value):
+    if len(value.split())>100:
+        raise ValidationError(
+            "Comment length must not exceed 100 symbols",
 
+        )
 
 
 class RatingUserForm(forms.Form):
@@ -54,7 +59,15 @@ class CommentEstUserForm(forms.Form):
 
         description = forms.CharField(validators=[
             MinLengthValidator(1, message='input more than 1 symbol'),
-            validate_length_description
+            validate_length_comment_description
         ])
+        rating = forms.IntegerField(validators=[
+            MaxValueValidator(5, message='input rating between 1 and 5'),
+            MinValueValidator(1, message='input rating between 1 and 5')
+
+        ])
+
+
+
 
 

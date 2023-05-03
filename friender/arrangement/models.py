@@ -93,7 +93,7 @@ class Establishments(models.Model):
     category = models.CharField(max_length=1, choices=CATEGORY, verbose_name='категория')
     address = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=100, null=True)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, null=True)
     def __str__(self):
         return self.name
 
