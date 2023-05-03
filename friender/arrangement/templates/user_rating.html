@@ -1,0 +1,38 @@
+{% extends 'base.html'%}
+
+{% block title %}friends{% endblock  %}
+
+{% block content %}
+
+<table class="table table-success table-striped">
+  <thead>
+    <tr>
+
+        <th scope="col">Name</th>
+        <th scope="col">rating</th>
+        <th scope="col">description</th>
+<!--        <th scope="col">photo</th>-->
+
+    </tr>
+  </thead>
+  <tbody>
+
+    {% for rating in ratings %}
+
+        <tr>
+
+            <td>{{ rating.user.name }} {{ rating.user.surname }}</td>
+            <td>{{ rating.rating }}</td>
+            <td>{{ rating.description }}</td>
+<!--            <td>{% if  rating.photo %} <image style="max-height":100 </td>-->
+        </tr>
+    {% endif %}
+    {% endfor %}
+
+
+  </tbody>
+</table>
+
+
+
+{% endblock %}
