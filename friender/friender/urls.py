@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+from django.urls import include, path
 
 
 #  маршрутизация
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('arrangement/', include("arrangement.urls"))
+    path('arrangement/', include("arrangement.urls")),
+    path('__debug__/', include('debug_toolbar.urls'))
 ]

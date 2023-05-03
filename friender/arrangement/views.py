@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import View
-from .models import Users
+from .models import *
+from .forms import *
+from django.core.paginator import Paginator
 import datetime
 
 # friends = {
@@ -36,27 +38,103 @@ def main_page(request):
 
 def place_arrangements (request):
     context = {
-        "establishments": establishments,
+        "establishments": Establishments.objects.all(),
 
     }
     return render(request, 'establishments.html', context=context)
 
 
-def all_friends (request):
+def all_friends(request):
+    # users = Users.objects.all()
+    # paginator = Paginator(users, 20)  # Show 25 contacts per page.
+    #
+    # page_number = request.GET.get("page")
+    # page_obj = paginator.get_page(page_number)
     context = {
-        "friends": Users.objects.all(),
-
+        "friends": Users.objects.all()[:40]
+        # "page_obj" = page.obj
     }
+
     return render(request, 'friends.html', context=context)
 
 def static_url(request):
     return render(request, "static_example.html")
 
+def user_rating(request):
+    context = {
+        "ratings": UserRating.objects.all().select_related('user')
+    }
+    return render(request, 'user_rating.html', context=context)
+
+def user_form_rating(request,**kwargs):
+    user_id = int(kwargs['id'])
+    context = {}
+    if request.method == 'POST':
+        form = RatingUserForm(request.POST, request.FILES)
+        context['form'] = form
+        if form.is_valid():
+            UserRating.objects.create(
+                user_id=user_id,
+                rating=request.POST['rating'],
+                description=request.POST['description']
+            )
+            return redirect('user_rating')
+    else:
+        form = RatingUserForm()
+        context['form'] = form
+
+
+    return render(request, 'user_form_rating.html', context=context)
+
+def create_user(request):
+    context = {}
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            form.save()
+            return redirect('friends')
+    else:
+        form = CreateUserForm()
+        context['form'] = form
+
+
+    return render(request, 'create_user_form.html', context=context)
+
+
+
+
+
+def booking_place(request):
+    context = {}
+    if request.method == 'POST':
+        form = BookingUserForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            form.save()
+            return redirect('friends')
+    else:
+        form = BookingUserForm()
+        context['form'] = form
+
+
+    return render(request, 'booking_place.html', context=context)
+
+def comment_establishment(request):
+    context = {}
+    if request.method == 'POST':
+        form = CommentEstUserForm(request.POST)
+        context['form'] = form
+        if form.is_valid():
+            return redirect('friends')
+    else:
+        form = CommentEstUserForm()
+        context['form'] = form
+
+    return render(request, 'comment_establishment.html', context=context)
 def rules(request):
     return render(request, 'rules.html')
 
-# def static_url(request):
-#     return render(request, "static_example.html")
 
 def free_peoples(request):
     context = {
