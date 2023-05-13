@@ -11,28 +11,61 @@
         <th scope="col">Name</th>
         <th scope="col">rating</th>
         <th scope="col">description</th>
-<!--        <th scope="col">photo</th>-->
+        <th scope="col">photo</th>
 
     </tr>
   </thead>
   <tbody>
 
-    {% for rating in ratings %}
+    {% for rating in page_obj %}
 
         <tr>
 
             <td>{{ rating.user.name }} {{ rating.user.surname }}</td>
             <td>{{ rating.rating }}</td>
             <td>{{ rating.description }}</td>
-<!--            <td>{% if  rating.photo %} <image style="max-height":100 </td>-->
+
+            <td>{% if  rating.photo %} <img style="max-height:100px" src="{{ rating.photo.url }}"/> {% endif %} </td>
         </tr>
-    {% endif %}
+
     {% endfor %}
 
 
   </tbody>
 </table>
 
+
+<nav aria-label="...">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page=1">first</a>
+    </li>
+    {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+
+        <li class="page-item active" aria-current="page">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+
+      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+      <li class="page-item" aria-current="page">
+      <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+       </li>
+      {% endif %}
+      {% endfor %}
+
+
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last</a>
+        </li>
+      {% endif %}
+  </ul>
+</nav>
 
 
 {% endblock %}

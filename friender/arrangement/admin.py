@@ -5,15 +5,13 @@ from django.db.models import F
 from django.utils.safestring import mark_safe
 
 
-
-
-class UserRatingInLine(admin.TabularInline):
+class UserRatingInLine(admin.StackedInline):
     model = UserRating
+    extra = 2
 
-
-class HobbiesInLine(admin.StackedInline):
+class HobbiesInLine(admin.TabularInline):
     model = Hobbies.user.through
-    extra = 3
+    extra = 0
 
 
 @admin.action(description='Change city')
@@ -36,6 +34,12 @@ def check_capital(object):
     return 'capital' if object.city in ['Minsk','Moscow'] else 'simple city'
 
 color_code  = 'FF33E0'
+
+@admin.display(description='фото')
+def get_html_photo(objects):
+    if objects.photo:
+        return mark_safe(f'<img src={objects.photo.url} width=50>')
+@admin.register(Users)
 class UsersAdmin(admin.ModelAdmin):
 
     @admin.display
@@ -47,9 +51,10 @@ class UsersAdmin(admin.ModelAdmin):
             self.surname,
         )
 
-    fields = ['name','surname','age','sex','email','city'] #вывод поле внутри ячейки
-    list_display = (colored_name, 'name', 'surname','age','sex','email','city',check_capital) #колонки
-    list_display_links = [colored_name,'name','surname'] #активные поля
+
+    fields = ['name','surname','age','sex','email','city', 'photo'] #вывод поле внутри ячейки
+    list_display = (colored_name,'age','sex','email',get_html_photo, 'city',check_capital) #колонки
+    list_display_links = [colored_name] #активные поля
     list_editable = ['age', 'city'] #поля, которые можно сразу менять
     ordering = ['name'] #сортировка по имени
     search_fields = ['sex','city','age'] #поиск по значению
@@ -62,6 +67,13 @@ class UsersAdmin(admin.ModelAdmin):
 
     ]
     actions = [change_city]
+
+
+@admin.register(UserRating)
+class UserRatingAdmin(admin.ModelAdmin):
+
+    list_display = ["rating", "user", get_html_photo]
+    list_display_links = ['rating', 'user']
 
 
 
@@ -84,17 +96,19 @@ class PassportAdmin(admin.ModelAdmin):
     fields = ['passport_id','user']
     list_display = ['passport_id','user']
     list_display_links = ['passport_id','user']
-
+@admin.register(Establishments)
 class EstablishmentsAdmin(admin.ModelAdmin):
-    fields = ['name','category','address','phone']
-    list_display = ['name','category']
+
+    # get_html_photo.short_descriptions = 'фото'
+
+    fields = ['name','category','address','phone','photo']
+    list_display = ['name','category',get_html_photo]
     list_display_links = ['name','category']
     search_fields = ['name', 'category']
 
 class RatingAdmin(admin.ModelAdmin):
     fields = ['rating', 'description']
     list_display = ['establishment', 'rating', 'description']
-
 
 
 
@@ -106,12 +120,12 @@ class RatingAdmin(admin.ModelAdmin):
 #         self.name,
 #         self.surname,
 #     )
-
-admin.site.register(Users, UsersAdmin)
-admin.site.register(UserRating)
+#
+# admin.site.register(Users, UsersAdmin)
+# admin.site.register(UserRating)
 admin.site.register(Hobbies, HobbiesAdmin)
 admin.site.register(EstablishmentsRating, RatingAdmin)
-admin.site.register(Establishments, EstablishmentsAdmin)
+# admin.site.register(Establishments, EstablishmentsAdmin)
 admin.site.register(Passport, PassportAdmin)
 admin.site.register(Arrangements)
 admin.site.register(Host)

@@ -1,9 +1,14 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views import View
 from .models import *
 from .forms import *
+from django.db import transaction
 from django.core.paginator import Paginator
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView
 import datetime
 
 # friends = {
@@ -45,14 +50,15 @@ def place_arrangements (request):
 
 
 def all_friends(request):
-    # users = Users.objects.all()
-    # paginator = Paginator(users, 20)  # Show 25 contacts per page.
-    #
-    # page_number = request.GET.get("page")
-    # page_obj = paginator.get_page(page_number)
+    users = Users.objects.all().prefetch_related("hobbies_set", "userrating_set")
+    paginator = Paginator(users, 10)  # показывать кол-во друзей на странице.
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "friends": Users.objects.all()[:40]
-        # "page_obj" = page.obj
+        "friends": users,
+        'page_obj': page_obj
     }
 
     return render(request, 'friends.html', context=context)
@@ -61,8 +67,19 @@ def static_url(request):
     return render(request, "static_example.html")
 
 def user_rating(request):
+    # context = {
+    #     "ratings": UserRating.objects.all().select_related('user')
+    # }
+    users = UserRating.objects.all().select_related('user')
+    paginator = Paginator(users, 5)  # показывать кол-во друзей на странице.
+
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        "ratings": UserRating.objects.all().select_related('user')
+
+        "ratings": users,
+        "page_obj": page_obj
     }
     return render(request, 'user_rating.html', context=context)
 
@@ -76,7 +93,8 @@ def user_form_rating(request,**kwargs):
             UserRating.objects.create(
                 user_id=user_id,
                 rating=request.POST['rating'],
-                description=request.POST['description']
+                description=request.POST['description'],
+                photo = request.FILES["photo"]
             )
             return redirect('user_rating')
     else:
@@ -100,9 +118,51 @@ def create_user(request):
 
 
     return render(request, 'create_user_form.html', context=context)
+@transaction.atomic
+def make_arrangements(request):
+    context = {}
+    if request.method == "POST":
+        form = ArrangementForm(request.POST)
+        context["form"] = form
+        guest = Guest.objects.all().order_by('?')[0]  #получаем случайного гостя
+        if form.is_valid():  #проверяем валидность формы
 
+            host_id = int(request.POST['host'][0]) # вытягиваем хоста по нулевому значению
+            place_id = int(request.POST['place'][0])
 
+            host = Host.objects.get(users_ptr_id=host_id)
+            establishments = Establishments.objects.get(id=place_id)
 
+            if host.status == 'a':
+                host.status = 'b'
+                host.save()
+                Arrangements.objects.create(
+                    host=host,
+                    guest=Guest.objects.get(users_ptr_id=guest.id),
+                    establishments=establishments
+                )
+
+            return redirect("friends")
+    else:
+        form = ArrangementForm()
+        context["form"] = form
+
+    return render(request, "make_arrangement.html", context=context)
+
+        #     if host.status == 'a':
+        #         host.status = 'b'
+        #         host.save()
+        #         Arrangements.objects.create(
+        #             host=host,
+        #             guest=Guest.objects.get(users_ptr_id=guest.id),
+        #             establishments=establishments
+        #         )
+        #
+        #         return redirect("friends")
+        # else:
+        #     form = ArrangementForm()
+        #     context["form"] = form
+        # return render(request, "make_arrangement.html", context=context)
 
 
 def booking_place(request):
@@ -152,3 +212,16 @@ def busy_peoples(request):
 
 def dates (request):
     return render(request, 'date.html')
+
+
+class PlaceListView(ListView):
+    template_name = 'establishments.html'
+    model = Establishments
+    context_object_name = "establishments"
+    # queryset = Establishments.objects.all()[:4]
+
+class EstablishmentsCreateView(CreateView):
+        template_name = 'createplace.html'
+        model = Establishments
+        fields = ["name", "category", "address", "phone"]
+        success_url = reverse_lazy("establishments")

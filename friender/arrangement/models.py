@@ -4,7 +4,12 @@ from datetime import datetime
 from django.core.signals import request_finished
 from django.db.models.signals import post_save,m2m_changed
 from django.dispatch import receiver
-# Create your models here.
+
+STATUS = [
+    ('a','available'),
+    ('b','busy')
+]
+
 SEX = [
     ('m', 'male'),
     ('f', 'female')
@@ -30,6 +35,7 @@ class Users(models.Model):
     sex = models.CharField(max_length=1, choices=SEX,verbose_name='пол')
     email = models.EmailField(null=True, verbose_name='почта')
     city = models.CharField(max_length=100, default='Minsk', verbose_name='город')
+    photo = models.ImageField(upload_to="photo_user", null=True)
     class Meta:
     #     indexes = [
     #         models.Index(fields=["age", 'name']),
@@ -46,18 +52,19 @@ class Users(models.Model):
         return self.name
 
 class Host(Users):
-    max_spent_value = models.PositiveIntegerField(null=True)
+    max_spend_value = models.PositiveIntegerField(null=True)
+    status = models.CharField(choices=STATUS, max_length=1, default='a')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.max_spend_value})"
 
     # class Meta:
     #     verbose_name_plural = 'приглашающие'
 
 class Guest(Users):
-    min_bill_value = models. PositiveIntegerField(null=True)
+    min_bill_value = models.PositiveIntegerField(null=True)
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.min_bill_value})"
 
     # class Meta:
     #     verbose_name_plural = 'гости'
@@ -75,7 +82,7 @@ class Hobbies(models.Model):
     user = models.ManyToManyField("Users")
 
     def __str__(self):
-        return self.hobby
+        return str(self.hobby)
 
 
     class Meta:
@@ -87,15 +94,15 @@ class Arrangements(models.Model):
 
 
 
-
 class Establishments(models.Model):
     name = models.CharField(max_length=15, verbose_name='наименование')
     category = models.CharField(max_length=1, choices=CATEGORY, verbose_name='категория')
     address = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=255, null=True)
+    photo = models.ImageField(upload_to="photo_establishments", null=True)
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
     class Meta:
         indexes = [
@@ -119,10 +126,21 @@ class EstablishmentsRating(Rating):
 
 class UserRating(Rating):
     user = models.ForeignKey('Users', on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="photo_ratings",null=True)
+    photo = models.ImageField(upload_to="photo_ratings",null=True) # "upload_to"- наименование папки куда загружаем фото
     def __str__(self):
         return str(self.rating)
 
+# @receiver(post_save, sender=Users)
+def user_created(sender, instance, **kwargs):
+    print('signal work')
+    print(sender)
+    print(instance)
+    print(instance.age)
+    hobby = Hobbies.objects.get(id=1)
+    instance.hobbies_set.add(hobby)
+
+#
+post_save.connect(receiver=user_created, sender=Users)
 
 # class Establishmensts(models.Model):
 #     name_place = models.CharField(max_length=40)

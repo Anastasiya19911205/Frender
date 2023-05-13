@@ -6,3 +6,6 @@ django-debug-toolbar==4.0.0
 django-crispy-forms==2.0
 crispy-bootstrap5==0.7
 Pillow==9.5.0
+djangorestframework==3.14.0
+django-filter==23.2
+Markdown==3.4.3

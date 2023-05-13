@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'crispy_forms',
     'crispy_bootstrap5',
-
+    'rest_framework',
 
 
 ]
@@ -137,6 +137,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# media
+MEDIA_URL = 'media/'
+MEDIA_ROOT = 'media_files'
 
 
 # Default primary key field type

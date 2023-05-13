@@ -16,27 +16,42 @@ def validate_length_comment_description(value):
 
         )
 
+class RatingUserForm(forms.ModelForm):
+    class Meta:
+        model = UserRating
+        exclude = ("user",)
 
-class RatingUserForm(forms.Form):
-    rating = forms.IntegerField(validators=[
-        MaxValueValidator(5, message='input rating between 1 and 5'),
-        MinValueValidator(1, message='input rating between 1 and 5')
 
-    ])
-    description = forms.CharField(
-        validators =[
-            MinLengthValidator(1, message='input more than 1 symbol'),
-            validate_length_description
-        ],
-        widget=forms.Textarea(
-            attrs={
-                'cols':30,
-                'rows':3,
-                'placeholder':'you opinion about arrangement',
-                'class':'special'
-            }
-        )
-    )
+# class RatingUserForm(forms.Form):
+#     rating = forms.IntegerField(validators=[
+#         MaxValueValidator(5, message='input rating between 1 and 5'),
+#         MinValueValidator(1, message='input rating between 1 and 5')
+#
+#     ])
+#     description = forms.CharField(
+#         validators=[
+#             MinLengthValidator(1, message='input more than 1 symbol'),
+#             validate_length_description
+#         ],
+#         widget=forms.Textarea(
+#             attrs={
+#                 'cols':30,
+#                 'rows':3,
+#                 'placeholder':'you opinion about arrangement',
+#                 'class':'special'
+#             }
+#         )
+#     )
+
+class EstablishmentCreateForm(forms.ModelForm):
+    class Meta:
+        model = Establishments
+        fields = ("name","category","address","phone")
+
+class ArrangementForm(forms.Form):
+    host = forms.ChoiceField(choices=Host.objects.values_list('id','name'))  #вывести всех наших пользователей в choices формате, values_list- позволяет вывести список данных
+    place = forms.ChoiceField(choices=Establishments.objects.values_list('id','name'))
+
 class CreateUserForm(forms.ModelForm):
     class Meta:
         model = Users
