@@ -14,6 +14,7 @@
         <th scope="col">Category</th>
         <th scope="col">Address</th>
         <th scope="col">Phone</th>
+        <th scope="col">Photo</th>
 <!--        <th scope="col">Description</th>-->
 
     </tr>
@@ -26,6 +27,7 @@
         <td>{{ establishment.get_category_display }}</td>
         <td>{{ establishment.address }}</td>
         <td>{{ establishment.descriptions }}</td>
+        <td>{% if establishment.photo %} <img style="max-height: 100px" src="{{establishment.photo.url}}" />{% endif %}</td>
 
     </tr>
         {% endfor %}
@@ -33,6 +35,38 @@
 
   </tbody>
 </table>
+
+<nav aria-label="...">
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+    <li class="page-item">
+        <a class="page-link" href="?page=1">first</a>
+    </li>
+    {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+
+        <li class="page-item active" aria-current="page">
+        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+
+      {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+      <li class="page-item" aria-current="page">
+      <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+       </li>
+      {% endif %}
+      {% endfor %}
+
+
+
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last</a>
+        </li>
+      {% endif %}
+  </ul>
+</nav>
 
 
 

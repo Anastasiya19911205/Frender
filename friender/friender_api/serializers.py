@@ -1,11 +1,16 @@
 from rest_framework import serializers
 from arrangement.models import Establishments
 
-class EstablishmentsSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    category = serializers.CharField(max_length=200)
-    address = serializers.CharField(max_length=200)
-    phone = serializers.CharField(max_length=200)
+# serializers = обьект который переводит модели в json формат
+class EstablishmentsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Establishments
+        fields = ('name', 'category', 'address', 'phone')
+    # name = serializers.CharField(max_length=200)
+    # category = serializers.CharField(max_length=200)
+    # address = serializers.CharField(max_length=200)
+    # phone = serializers.CharField(max_length=200)
     def create(self, validated_data):
         return Establishments.objects.create(**validated_data)
 

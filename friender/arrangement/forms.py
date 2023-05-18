@@ -15,11 +15,14 @@ def validate_length_comment_description(value):
             "Comment length must not exceed 100 symbols",
 
         )
-
+#через ModelForm идет привязка к определенной модели
 class RatingUserForm(forms.ModelForm):
     class Meta:
         model = UserRating
         exclude = ("user",)
+        # widgets = {
+        #     "description": forms.Textarea(attrs={"cols":80, "rows":20})
+        # }
 
 
 # class RatingUserForm(forms.Form):
@@ -56,11 +59,6 @@ class CreateUserForm(forms.ModelForm):
     class Meta:
         model = Users
         exclude = ('email',)
-        age = forms.IntegerField(validators=[
-            MaxValueValidator(90, message='enter your age from 18 to 90 years old'),
-            MinValueValidator(18, message='enter your age from 18 to 90 years old')
-
-        ])
 
 
 class BookingUserForm(forms.ModelForm):

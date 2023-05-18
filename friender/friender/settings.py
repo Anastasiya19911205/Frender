@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'rest_framework',
+    'friender_api.apps.FrienderApiConfig',
+    'rest_framework.authtoken',
+
 
 
 ]
@@ -152,3 +155,15 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+#DRF конфигурация
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        ], #аутентификация по токенам для всех наших моделей
+
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+        ] #если мы аутонтефицированы, то получаем доступ ко всем моделям
+
+
+}

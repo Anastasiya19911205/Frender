@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core.signals import request_finished
 from django.db.models.signals import post_save,m2m_changed
 from django.dispatch import receiver
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 STATUS = [
     ('a','available'),
@@ -31,7 +32,12 @@ HOBBIES =[
 class Users(models.Model):
     name = models.CharField(max_length=100,verbose_name='имя')
     surname = models.CharField(max_length=100, verbose_name='фамилия')
-    age = models.IntegerField(verbose_name='возраст')
+    age = models.IntegerField(
+        validators=[
+            MaxValueValidator(90, message='enter your age from 18 to 90 years old'),
+            MinValueValidator(18, message='enter your age from 18 to 90 years old')
+            ]
+    )
     sex = models.CharField(max_length=1, choices=SEX,verbose_name='пол')
     email = models.EmailField(null=True, verbose_name='почта')
     city = models.CharField(max_length=100, default='Minsk', verbose_name='город')
@@ -136,7 +142,7 @@ def user_created(sender, instance, **kwargs):
     print(sender)
     print(instance)
     print(instance.age)
-    hobby = Hobbies.objects.get(id=1)
+    hobby = Hobbies.objects.last()
     instance.hobbies_set.add(hobby)
 
 #
